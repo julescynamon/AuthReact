@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState } from "react";
 import { UserContext } from "../Context/userContext";
 
 export default function SignUpModal() {
-	const { modalState, toggleModals } = useContext(UserContext);
+	const { modalState, toggleModals, signUp } = useContext(UserContext);
 	const [validation, setValidation] = useState("");
 
 	const inputs = useRef([]);
@@ -12,7 +12,9 @@ export default function SignUpModal() {
 		}
 	};
 
-	const handleForm = (e) => {
+	const formRef = useRef();
+
+	const handleForm = async (e) => {
 		e.preventDefault();
 		if (
 			(inputs.current[1].value.length || inputs.current[2].value.length) <
@@ -24,6 +26,15 @@ export default function SignUpModal() {
 			setValidation("password do not match");
 			return;
 		}
+
+		try {
+			const cred = await signUp(
+				inputs.current[0].value,
+				inputs.current[1].value,
+			);
+			formRef.current.reset();
+			setValidation("");
+		} catch (err) {}
 	};
 
 	return (
@@ -50,6 +61,7 @@ export default function SignUpModal() {
 
 								<div className='modal-body'>
 									<form
+										ref={formRef}
 										onSubmit={handleForm}
 										className='sign-up-form'
 									>
