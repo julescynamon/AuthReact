@@ -1,8 +1,30 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { UserContext } from "../Context/userContext";
 
 export default function SignUpModal() {
 	const { modalState, toggleModals } = useContext(UserContext);
+	const [validation, setValidation] = useState("");
+
+	const inputs = useRef([]);
+	const addInputs = (el) => {
+		if (el && !inputs.current.includes(el)) {
+			inputs.current.push(el);
+		}
+	};
+
+	const handleForm = (e) => {
+		e.preventDefault();
+		if (
+			(inputs.current[1].value.length || inputs.current[2].value.length) <
+			6
+		) {
+			setValidation("6 characters min");
+			return;
+		} else if (inputs.current[1].value !== inputs.current[2].value) {
+			setValidation("password do not match");
+			return;
+		}
+	};
 
 	return (
 		<>
@@ -27,7 +49,10 @@ export default function SignUpModal() {
 								</div>
 
 								<div className='modal-body'>
-									<form className='sign-up-form'>
+									<form
+										onSubmit={handleForm}
+										className='sign-up-form'
+									>
 										<div className='mb-3'>
 											<label
 												htmlFor='signUpEmail'
@@ -36,6 +61,7 @@ export default function SignUpModal() {
 												Email adress
 											</label>
 											<input
+												ref={addInputs}
 												name='email'
 												required
 												type='email'
@@ -52,6 +78,7 @@ export default function SignUpModal() {
 												Password
 											</label>
 											<input
+												ref={addInputs}
 												name='pwd'
 												required
 												type='password'
@@ -68,13 +95,16 @@ export default function SignUpModal() {
 												Repeat Password
 											</label>
 											<input
+												ref={addInputs}
 												name='pwd'
 												required
 												type='password'
 												className='form-control'
 												id='repeatPwd'
 											/>
-											<p className='text-danger mt-1'></p>
+											<p className='text-danger mt-1'>
+												{validation}
+											</p>
 										</div>
 
 										<button className='btn btn-primary'>
