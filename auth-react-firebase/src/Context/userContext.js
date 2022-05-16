@@ -19,10 +19,12 @@ export function UserContextProvider(props) {
 			setLoadingData(false);
 		});
 		return unsubscribe;
-	}, [])
+	}, []);
 
 	const signUp = (email, pwd) =>
 		createUserWithEmailAndPassword(auth, email, pwd);
+	
+	const signIn = (email, pwd) => signInWithEmailAndPassword(auth, email, pwd);
 
 	// Partie Modal
 	const [modalState, setModalState] = useState({
@@ -52,7 +54,7 @@ export function UserContextProvider(props) {
 	};
 
 	return (
-		<UserContext.Provider value={{ modalState, toggleModals, signUp }}>
+		<UserContext.Provider value={{ modalState, toggleModals, signUp, signIn, currentUser }}>
 			{!loadingData && props.children}
 		</UserContext.Provider>
 	);

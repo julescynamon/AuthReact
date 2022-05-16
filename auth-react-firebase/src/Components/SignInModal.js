@@ -1,10 +1,39 @@
 import React, { useContext, useRef, useState } from "react";
 import { UserContext } from "../Context/userContext";
+import { useNavigate } from "react-router-dom";
 
 export default function SignInModal() {
 	const { modalState, toggleModals, signIn } = useContext(UserContext);
+	const [validation, setValidation] = useState("");
+	const navigate = useNavigate();
+
+	const inputs = useRef([]);
+	const addInputs = (el) => {
+		if (el && !inputs.current.includes(el)) {
+			inputs.current.push(el);
+		}
+	};
+
+	const formRef = useRef();
+
+	const handleForm = async (e) => {
+		e.preventDefault();
+
+		try {
+			const cred = await signIn(
+				inputs.current[0].value,
+				inputs.current[1].value,
+			);
+			setValidation("");
+			toggleModals("close");
+			navigate("/private/private-home");
+		} catch {
+			setValidation("Email/Password incorrect !");
+		}
+	};
 
 	const closeModal = () => {
+		setValidation("");
 		toggleModals("close");
 	};
 
@@ -23,7 +52,7 @@ export default function SignInModal() {
 						<div className='modal-dialog'>
 							<div className='modal-content'>
 								<div className='modal-header'>
-									<h5 className='modal-title'>Sign Up</h5>
+									<h5 className='modal-title'>Sign In</h5>
 									<button
 										onClick={closeModal}
 										className='btn-close'
@@ -31,7 +60,10 @@ export default function SignInModal() {
 								</div>
 
 								<div className='modal-body'>
-									<form className='sign-up-form'>
+									<form
+										onSubmit={handleForm}
+										className='sign-up-form'
+									>
 										<div className='mb-3'>
 											<label
 												htmlFor='signInEmail'
@@ -40,31 +72,34 @@ export default function SignInModal() {
 												Email adress
 											</label>
 											<input
+												ref={addInputs}
 												name='email'
 												required
 												type='email'
 												className='form-control'
-												id='signInEmail'
+												id='signUpEmail'
 											/>
 										</div>
 
 										<div className='mb-3'>
 											<label
-												htmlFor='signInPwd'
+												htmlFor='signUpPwd'
 												className='form-label'
 											>
 												Password
 											</label>
 											<input
+												ref={addInputs}
 												name='pwd'
 												required
 												type='password'
 												className='form-control'
-												id='signInPwd'
+												id='signUpPwd'
 											/>
-											<p className='text-danger mt-1'></p>
+											<p className='text-danger mt-1'>
+												{validation}
+											</p>
 										</div>
-
 										<button className='btn btn-primary'>
 											Submit
 										</button>
